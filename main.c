@@ -27,7 +27,7 @@ int main(int argc, char *argv[]) {
   cur_dev = devs;
   while (cur_dev) {
     // Look for vendor-defined Raw HID usage_page
-    if (cur_dev->usage_page == 0xFF60 || cur_dev->usage_page == 0xFF00) {
+    if (cur_dev->usage_page == 0xFF60) {
       raw_path = strdup(cur_dev->path); // save for opening
     }
 
