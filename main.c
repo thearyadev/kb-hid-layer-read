@@ -5,7 +5,8 @@
 
 int main(int argc, char *argv[]) {
   if (argc < 3) { 
-    printf("Usage: %s <VID hex> <PID hex>", argv[0]);
+    printf("Usage: %s <VID hex> <PID hex>\n", argv[0]);
+    return 1;
   } 
 
   unsigned int vid = (unsigned int)strtoul(argv[1], NULL, 16);

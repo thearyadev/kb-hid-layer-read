@@ -1,6 +1,6 @@
 pkgname=kb-readlayer
 pkgver=1.0.0
-pkgrel=4
+pkgrel=5
 pkgdesc="reads the layer info from hid raw for your qmk keyboard"
 arch=('x86_64')
 url="https://github.com/thearyadev/kb-hid-layer-read"
