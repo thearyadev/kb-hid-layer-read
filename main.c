@@ -4,56 +4,45 @@
 #include <string.h>
 
 int main(int argc, char *argv[]) {
-  unsigned int vid = 0;
-  unsigned int pid = 0;
-
-  if (argc > 2) { // given 3 total args, two of which are the vid and pid
-    vid = (unsigned int)strtoul(argv[1], NULL, 16);
-    pid = (unsigned int)strtoul(argv[2], NULL, 16);
-  } else {
+  if (argc < 3) { 
     printf("Usage: %s <VID hex> <PID hex>", argv[0]);
-    return 1;
-  }
+  } 
 
-  int res;
-  struct hid_device_info *devs, *cur_dev;
-  hid_device *handle = NULL;
-  char *raw_path = NULL;
+  unsigned int vid = (unsigned int)strtoul(argv[1], NULL, 16);
+  unsigned int pid = (unsigned int)strtoul(argv[2], NULL, 16);
 
   if (hid_init()) {
     return -1;
   }
-  devs = hid_enumerate(vid, pid);
-  cur_dev = devs;
-  while (cur_dev) {
-    // Look for vendor-defined Raw HID usage_page
-    if (cur_dev->usage_page == 0xFF60) {
-      raw_path = strdup(cur_dev->path); // save for opening
-    }
+  struct hid_device_info *devs = hid_enumerate(vid, pid);
+  struct hid_device_info *cur = devs;
+  hid_device *handle = NULL;
 
-    cur_dev = cur_dev->next;
+  while (cur) {
+    if (cur->usage_page == 0xFF60) {
+      handle = hid_open_path(cur->path);
+      break;
+    }
+    cur = cur->next;
   }
   hid_free_enumeration(devs);
-  if (!raw_path) {
-    return 1;
-  }
-  handle = hid_open_path(raw_path);
+
   if (!handle) {
     return 1;
   }
 
   unsigned char buf[32];
-  res = hid_read(handle, buf, sizeof(buf));
+  int res = hid_read_timeout(handle, buf, sizeof(buf), 100);
   if (res > 0) {
-    switch (buf[0]) {
-    case 3:
+    unsigned char layer = buf[0];
+    if (layer == 3){
       printf("{\"layer\":\"Game\"}\n");
-      break;
-    default: // anything other than game is a normal layer
+    } else {
       printf("{\"layer\":\"Normal\"}\n");
-      break;
     }
+  } else{
+      printf("{\"layer\":\"Error\"}\n");
   }
   hid_close(handle);
-  hid_exit();
+  return 0;
 }
