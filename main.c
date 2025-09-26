@@ -47,11 +47,11 @@ int main(int argc, char *argv[]) {
   if (res > 0) {
     switch (buf[0]) {
     case 3:
-      printf("Game\n");
+      printf("{\"layer\":\"Game\"}\n");
       break;
     default: // anything other than game is a normal layer
-        printf("Normal\n");
-        break;
+      printf("{\"layer\":\"Normal\"}\n");
+      break;
     }
   }
   hid_close(handle);
